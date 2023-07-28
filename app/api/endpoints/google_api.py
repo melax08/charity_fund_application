@@ -1,4 +1,5 @@
 from aiogoogle import Aiogoogle
+from aiogoogle.excs import AiogoogleError
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,14 +12,14 @@ from app.services.google_api import (
     set_user_permissions,
     spreadsheets_update_value
 )
-
+from app.core.constants import SPREADSHEETS_URL
 
 router = APIRouter()
 
 
 @router.post(
     '/',
-    response_model=list[dict[str, str]],
+    response_model=str,
     dependencies=[Depends(current_superuser)],
 )
 async def get_report(
@@ -32,11 +33,17 @@ async def get_report(
     """
     projects = await charity_project_crud.get_projects_by_completion_rate(
         session)
-    spreadsheet_id = await spreadsheets_create(wrapper_services)
-    await set_user_permissions(spreadsheet_id, wrapper_services)
-    await spreadsheets_update_value(
-        spreadsheet_id,
-        projects,
-        wrapper_services
-    )
-    return projects
+    try:
+        spreadsheet_id = await spreadsheets_create(wrapper_services)
+        await set_user_permissions(spreadsheet_id, wrapper_services)
+        await spreadsheets_update_value(
+            spreadsheet_id,
+            projects,
+            wrapper_services
+        )
+    except RuntimeError as error:
+        return str(error)
+    except AiogoogleError:
+        return ('Возникла ошибка при генерации google-таблицы. '
+                'Попробуйте создать отчет позже.')
+    return SPREADSHEETS_URL + spreadsheet_id

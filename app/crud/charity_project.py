@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Optional
 
 from fastapi.encoders import jsonable_encoder
@@ -45,7 +46,7 @@ class CRUDCharityProject(CRUDBase):
     @staticmethod
     async def get_projects_by_completion_rate(
             session: AsyncSession
-    ) -> list[dict[str, str]]:
+    ) -> list[list[str]]:
         closed_projects = await session.execute(
             select([CharityProject.name,
                     (func.extract('epoch',
@@ -57,7 +58,14 @@ class CRUDCharityProject(CRUDBase):
                 CharityProject.fully_invested == True).order_by('diff_seconds')  # noqa
         )
         closed_projects = closed_projects.all()
-        return closed_projects
+        return list(map(
+            lambda project: [
+                project[0],
+                str(timedelta(seconds=project[1])),
+                project[2]
+            ],
+            closed_projects)
+        )
 
 
 charity_project_crud = CRUDCharityProject(CharityProject)
