@@ -8,6 +8,7 @@ from app.api.endpoints import (
 )
 
 main_router = APIRouter()
+
 main_router.include_router(user_router)
 main_router.include_router(
     project_router, prefix='/charity_project', tags=['Projects']

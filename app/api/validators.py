@@ -29,7 +29,7 @@ async def check_project_exists(
     if project is None:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail='Project not found!'
+            detail='Проект не найден!'
         )
     return project
 
@@ -39,7 +39,6 @@ async def check_project_before_delete(
 ) -> Optional[CharityProject]:
     """Checks if the specified project exists
     and whether there were investments in it."""
-
     project = await check_project_exists(project_id, session)
 
     if project.invested_amount > MIN_INVESTED_AMOUNT:
@@ -55,7 +54,6 @@ async def check_project_before_update(
 ) -> Optional[CharityProject]:
     """Check if the specified project exists,
     is it closed and correct full amount set."""
-
     project = await check_project_exists(project_id, session)
 
     if project.fully_invested:
@@ -67,7 +65,7 @@ async def check_project_before_update(
     if full_amount is not None and full_amount < project.invested_amount:
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail=("You can't set full amount "
-                    "lower than already invested amount.")
+            detail=("Вы не можете установить общую сумму проекта меньше чем "
+                    "уже внесенные средства.")
         )
     return project

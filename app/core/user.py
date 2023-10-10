@@ -44,7 +44,6 @@ auth_backend = AuthenticationBackend(
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
-
     async def validate_password(
         self,
         password: str,

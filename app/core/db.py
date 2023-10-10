@@ -8,7 +8,7 @@ from app.core.config import settings
 
 
 class PreBase:
-
+    """Base class with default table name and id fields."""
     @declared_attr
     def __tablename__(cls):
         return cls.__name__.lower()
@@ -29,6 +29,7 @@ async def get_async_session():
 
 
 class ProjectDonateBase(Base):
+    """Base class for Project and Donate models."""
     __abstract__ = True
 
     full_amount = Column(Integer, nullable=False)

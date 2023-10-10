@@ -40,7 +40,9 @@ async def create_project(
 
 
 @router.get(
-    '/', response_model=List[ProjectDB], response_model_exclude_none=True
+    '/',
+    response_model=List[ProjectDB],
+    response_model_exclude_none=True
 )
 async def get_all_projects(
         session: AsyncSession = Depends(get_async_session)
